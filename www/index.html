@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2014 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="msapplication-tap-highlight" content="no"/>
+    <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+    <meta name="viewport"
+          content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"/>
+    <link rel="stylesheet" type="text/css" href="css/index.css"/>
+    <title>Hello World</title>
+    <style>
+        .table{
+            border: 1px solid #282828;
+            border-radius: 4px;
+        }
+        td{
+            border: 1px solid #282828;
+            border-radius: 4px;
+        }
+    </style>
+    <!-- amCharts javascript sources -->
+    <script type="text/javascript" src="js/amcharts/serial.js"></script>
+    <script type="text/javascript" src="js/amcharts/amcharts.js"></script>
+    <script type="text/javascript" src="js/amcharts/pie.js"></script>
+    <script type="text/javascript" src="js/amcharts/themes/light.js"></script>
+    <script type="text/javascript" charset="utf-8">
+
+        // Wait for device API libraries to load
+        //
+        document.addEventListener("deviceready", onDeviceReady, false);
+
+        // device APIs are available
+        //
+        function onDeviceReady() {
+
+        }
+
+        // alert dialog dismissed
+        function alertDismissed() {
+            // do something
+        }
+
+        // Show a custom alertDismissed
+        //
+        function showAlert() {
+            navigator.notification.alert(
+                    'You are the winner!',  // message
+                    alertDismissed,         // callback
+                    'Game Over',            // title
+                    'Done'                  // buttonName
+            );
+        }
+
+
+        function showW() {
+            window.open('http://intelinvest.ru', '_blank', 'location=yes');
+        }
+
+        function makeResponse() {
+            console.log(makeCounter(), 'ssss');
+            //var login = document.getElementById('login');
+            //var password = document.getElementById('password');
+            console.log('send ajax', 'trr');
+            //console.log(login.value, 'trr');
+            //console.log(password.value, 'trr');
+            // 1. Создаём новый объект XMLHttpRequest
+            var xhr = new XMLHttpRequest();
+            // 2. Конфигурируем его: GET-запрос на URL 'phones.json'
+            //xhr.open('GET', 'http://intelinvest.ru/RESTSERVICE/rest/sector', false);
+            xhr.open('GET', 'http://intelinvest.ru/RESTSERVICE/rest/portfoliotable/41', false);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader("service_key","f80ebc87-ad5c-4b29-9366-5359768df5a1");
+            xhr.setRequestHeader("auth_token","dfcf84c4-08f3-4fbd-8c15-c351cc54bf33");
+            xhr.send();
+            console.log(xhr.status + ': ' + xhr.statusText, 'trr1');
+            var response = xhr.responseText;
+            return response;
+        }
+
+        var data1 = [];
+        var toChart = [];
+        function showdlg() {
+            //var login = document.getElementById('login');
+            //var password = document.getElementById('password');
+            console.log('send ajax', 'trr');
+            //console.log(login.value, 'trr');
+            //console.log(password.value, 'trr');
+            // 1. Создаём новый объект XMLHttpRequest
+            var xhr = new XMLHttpRequest();
+            // 2. Конфигурируем его: GET-запрос на URL 'phones.json'
+            //xhr.open('GET', 'http://intelinvest.ru/RESTSERVICE/rest/sector', false);
+            xhr.open('GET', 'http://intelinvest.ru/RESTSERVICE/rest/portfoliotable/41', false);
+            //xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.overrideMimeType("application/json; charset=utf-8");
+            xhr.setRequestHeader("service_key","f80ebc87-ad5c-4b29-9366-5359768df5a1");
+            xhr.setRequestHeader("auth_token","dfcf84c4-08f3-4fbd-8c15-c351cc54bf33");
+            xhr.send();
+            console.log(xhr.status + ': ' + xhr.statusText, 'trr1');
+
+            if (xhr.status != 200) {
+                // обработать ошибку
+                // пример вывода: 404: Not Found
+
+                navigator.notification.alert(
+                        xhr.status + ': ' + xhr.statusText,  // message
+                        alertDismissed,         // callback
+                        'Error',            // title
+                        'Done'                  // buttonName
+                );
+
+            } else {
+                data1 = JSON.parse(xhr.responseText);
+                toChart = JSON.parse(xhr.responseText);
+                toChart.splice(toChart.length-1, 1);
+                //document.getElementById("responseDiv").innerHTML=xhr.responseText;
+                makeChartD();
+                makeTable();
+                // вывести результат
+                // responseText -- текст ответа.
+
+                navigator.notification.alert(
+                        xhr.responseText,  // message
+                        alertDismissed,         // callback
+                        'OK',            // title
+                        'Done'                  // buttonName
+                );
+            }
+
+        }
+
+        function makeChartD(){
+            //console.log(data1, 's');
+            AmCharts.makeChart("chartdiv",
+                    {
+                        "type": "pie",
+                        "path": "http://www.amcharts.com/lib/3/",
+                        "balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
+                        "titleField": "company",
+                        "valueField": "percCurrShare",
+                        "fontSize": 12,
+                        "radius": 100,
+                        "theme": "light",
+                        "allLabels": [],
+                        "balloon": {},
+                        "titles": [],
+                        "dataProvider": toChart
+                    }
+            );
+        }
+
+        function makeTable(){
+            //console.log(data1[1], 'ggg');
+            var parentElem = document.body;
+            for (var i = 0; i < data1.length; i++) {
+                console.log(data1[i].ticker, 'ggg');
+                var div = document.createElement('div');
+                //div.className("table");
+                div.innerHTML = "<table class='table'><tr><td>"+data1[i].company + "</td><td>"+data1[i].summaryCost+"</td></tr></table>";
+                parentElem.appendChild(div);
+            }
+        }
+
+    </script>
+</head>
+<body>
+<div id="chartdiv" style="width: 100%; height: 400px; background-color: aliceblue;" ></div>
+<p><input type="button" onclick="showdlg(); return false;" value="TEST"/></p>
+<p><div id="responseDiv" style="height: 300px;"></div></p>
+<!--
+<div class="app">
+    <h1>MyFirstApp</h1>
+
+
+    <p><input type="text" id="login"/></p>
+    <p><input type="password" id="password"/></p>
+
+    <p><input type="button" onclick="showdlg(); return false;" value="login"/></p>
+
+    <p style="font-size: large;"><a href="#" onclick="showdlg(); return false;">Test ajax</a></p>
+</div>
+<form>
+    <script type="text/javascript" src="js/amcharts/serial.js"></script>
+    <script type="text/javascript" src="js/amcharts/amcharts.js"></script>
+    <script type="text/javascript" src="js/amcharts/pie.js"></script>
+    <script type="text/javascript">
+        var chartData = [{
+            "country": "USA",
+            "visits": 4252
+        }, {
+            "country": "China",
+            "visits": 1882
+        }, {
+            "country": "Japan",
+            "visits": 1809
+        }, {
+            "country": "Germany",
+            "visits": 1322
+        }, {
+            "country": "UK",
+            "visits": 1122
+        }, {
+            "country": "France",
+            "visits": 1114
+        }, {
+            "country": "India",
+            "visits": 984
+        }, {
+            "country": "Spain",
+            "visits": 711
+        }, {
+            "country": "Netherlands",
+            "visits": 665
+        }, {
+            "country": "Russia",
+            "visits": 580
+        }, {
+            "country": "South Korea",
+            "visits": 443
+        }, {
+            "country": "Canada",
+            "visits": 441
+        }, {
+            "country": "Brazil",
+            "visits": 395
+        }, {
+            "country": "Italy",
+            "visits": 386
+        }, {
+            "country": "Australia",
+            "visits": 384
+        }, {
+            "country": "Taiwan",
+            "visits": 338
+        }, {
+            "country": "Poland",
+            "visits": 328
+        }];
+        var chart = new AmCharts.AmSerialChart();
+        chart.dataProvider = chartData;
+        chart.categoryField = "country";
+        var graph = new AmCharts.AmGraph();
+        graph.valueField = "visits";
+        graph.type = "column";
+        chart.addGraph(graph);
+        chart.write('chartdiv');
+    </script>
+    <div id="chartdiv" style="width: 100%; height: 800px;"></div>
+</form>
+-->
+<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript">
+    app.initialize();
+</script>
+</body>
+</html>
